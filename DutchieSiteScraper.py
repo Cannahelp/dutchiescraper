@@ -25,20 +25,21 @@ dispodomains = ['https://the-landing-dispensary-bridgeport.thelandingwv.com/', '
 
 
 ###############################################################################################################################################################################################
-#   This part of the script will scrape The Landing Dispensary Database for product and then append it to a sheet in the db so that the database can contain old data as well. 
+#                                           THE LANDING SCRAPING
+#       This part of the script will scrape The Landing Dispensary Database for product and then append it to a sheet in the db so that the database can contain old data as well. 
 #                                       May be easier to just have it create a file with the date and time appended to the file name.
 ###############################################################################################################################################################################################
 
 #def landingflowerscrape():
 
-domain = dispodomains[0] + 'stores/the-landing-dispensary-bridgeport/products/flower'
-driver.get(domain);
-time.sleep(2)
-
 
 ####################################################
 #    Flower Listings, Quantities and Prices
 ####################################################
+
+domain = dispodomains[0] + 'stores/the-landing-dispensary-bridgeport/products/flower'
+driver.get(domain);
+time.sleep(2)
 
 # Section below sets up the browser to press the space bar 4 times to scrape all of the items on the page (without this you can't scrape past what the initial page load displays)
 actions = ActionChains(driver)
