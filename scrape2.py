@@ -147,7 +147,7 @@ for category in CATEGORIES:
                 "straintype text, concentration text)".format(category_sql_friendly))
 
     data = []
-    #print(price)
+    print(productList)
     
     for product in productList:
         for index, price in enumerate(product.prices):
