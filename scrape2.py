@@ -148,7 +148,7 @@ for category in CATEGORIES:
 
     data = []
     print(productList)
-    
+'''    
     for product in productList:
         for index, price in enumerate(product.prices):
             strippedPrice = float(price.strip("$"))
@@ -168,7 +168,7 @@ for category in CATEGORIES:
     con.commit()
     con.close()
     print("Committed, took " + str(time.time() - float(categoryStartTime)) + " seconds.")
-
+'''
 print("Total run took " + str(time.time() - float(startTime)) + " seconds.")
 
 driver.quit()
