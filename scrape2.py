@@ -31,7 +31,6 @@ DUTCHIE_KEY_PAGE_NEXT = "hjQwsb"
 DUTCHIE_KEY_PAGE_PREV = "deZqfc"
 DUTCHIE_KEY_PAGE_NO_ITEMS = "nhlLt"
 
-
 class Product:
     def __init__(self, brand, name, sizes, prices, straintype, concentration):
         self.brand = brand
@@ -50,13 +49,11 @@ class Product:
             string_build += self.prices[0]
         return string_build
 
-
 def dutchie_get_num_pages():
     page_buttons = driver.find_elements(By.CLASS_NAME, DUTCHIE_KEY_PAGE_BUTTON)
     if len(page_buttons) == 0:
         return 0
     return int(page_buttons[-1].text) - 1
-
 
 startTime = time.time()
 
@@ -116,7 +113,7 @@ for category in CATEGORIES:
                 if len(product_sizes_list) > 0:
                     product_sizes.append(product_sizes_list[index].text)
                 product_prices.append(price.text)
-
+            
             try:
                 product_straintype = cell.find_element(By.CLASS_NAME, DUTCHIE_KEY_PRODUCT_STRAINTYPE).text
             except NoSuchElementException:
@@ -147,7 +144,7 @@ for category in CATEGORIES:
                 "straintype text, concentration text)".format(category_sql_friendly))
 
     data = []
-    print(productList)
+
 '''    
     for product in productList:
         for index, price in enumerate(product.prices):

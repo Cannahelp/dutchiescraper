@@ -108,8 +108,6 @@ def landingflowerscrape():
     flowerlistings = announcement.text
     print("Flower price page scraped.")
     
-    return flowerlistings;
-
 ##################################################################
 #          Concentrates Listings, Quantities and Prices
 ##################################################################
