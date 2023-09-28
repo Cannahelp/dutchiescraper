@@ -18,11 +18,18 @@ options.add_argument('--incognito')
 CHROMEDRIVERPATH = '/Users/justinwaugh/Downloads/chromedriver-mac-arm64/chromedriver'
 s = Service(CHROMEDRIVERPATH)
 driver = webdriver.Chrome(service=s, options=options)
-
-# Setting up the dispensaries to be scraped. Section also sets up their base URLs (extra path details can be appended later)
 dispos = ['The Landing', 'Zen Leaf', 'The Next Level Wellness', 'Trulieve', 'WV Relief']
 dispodomains = ['https://the-landing-dispensary-bridgeport.thelandingwv.com/', 'https://zenleafdispensaries.com/locations/clarksburg/medical-menu/', 'https://tnlw.us/shop-online/', 'https://shop.trulieve.com/', 'https://wv-relief.com/online-ordering/']
 
+# Setting up the dispensaries to be scraped. Section also sets up their base URLs (extra path details can be appended later)
+
+############################
+# Section below gets date information to prepend to CSV filename
+current_date = datetime.datetime.now().strftime("%Y%m%d") # Get the current date in the format "yyyymmdd"
+current_time = datetime.datetime.now()
+filetime = current_time.strftime('%H%M%S')
+#############################
+  
 
 ###############################################################################################################################################################################################
 #                                           THE LANDING SCRAPING
@@ -30,141 +37,140 @@ dispodomains = ['https://the-landing-dispensary-bridgeport.thelandingwv.com/', '
 #                                       May be easier to just have it create a file with the date and time appended to the file name.
 ###############################################################################################################################################################################################
 
-#def landingflowerscrape():
-
-
 ####################################################
 #    Flower Listings, Quantities and Prices
 ####################################################
+def landingflowerscrape():
 
-domain = dispodomains[0] + 'stores/the-landing-dispensary-bridgeport/products/flower'
-driver.get(domain);
-time.sleep(2)
+    domain = dispodomains[0] + 'stores/the-landing-dispensary-bridgeport/products/flower'
+    driver.get(domain);
+    time.sleep(2)
 
-# Section below sets up the browser to press the space bar 4 times to scrape all of the items on the page (without this you can't scrape past what the initial page load displays)
-actions = ActionChains(driver)
-for _ in range(5):
-    actions.send_keys(Keys.SPACE).perform()
-    time.sleep(.5)
+    # Section below sets up the browser to press the space bar 4 times to scrape all of the items on the page (without this you can't scrape past what the initial page load displays)
+    actions = ActionChains(driver)
+    for _ in range(5):
+        actions.send_keys(Keys.SPACE).perform()
+        time.sleep(.5)
 
-time.sleep(3) #Stuck this here to give the page enough time to load completely before scraping the data
+    time.sleep(3) #Stuck this here to give the page enough time to load completely before scraping the data
 
-# This line sets up the lists needed to be able to split the data up into their respective columns in the database.
-flower_brand, flower_name, flower_sih, flower_potency, flower_qty, flower_price = ([] for i in range(6)) 
-
-
-flowerbrand = driver.find_elements(By.XPATH, "//span[contains(@class, 'ProductBrand')]")    #Finds all brands on the page
-flowername = driver.find_elements(By.XPATH, "//span[contains(@class, 'ProductName')]")      #Finds all products on the page
-flowersih = driver.find_elements(By.XPATH, "//p[contains(@class, 'StrainText')]")           #Finds all strain types on page
-flowerpotency = driver.find_elements(By.XPATH, "//div[contains(@class, 'Potency')]")        #Finds all potency info on page
-#flowerprice = driver.find_elements(By.XPATH, "")        #Finds all pricing info on page
-
-# This section appends information to respective lists.
-for match in flowerbrand:
-    flower_brand.append(match.text)
-for match in flowername:
-    flower_name.append(match.text)
-for match in flowersih:
-    flower_sih.append(match.text)
-for match in flowerpotency:
-    flower_potency.append(match.text)
+    # This line sets up the lists needed to be able to split the data up into their respective columns in the database.
+    flower_brand, flower_name, flower_sih, flower_potency, flower_qty, flower_price = ([] for i in range(6)) 
 
 
-#print('\n\n\n\n\n\n', flower_brand[1], "\n", flower_name[1], "\n", flower_sih[1], "\n", flower_potency[1], "\n\n\n")
+    flowerbrand = driver.find_elements(By.XPATH, "//span[contains(@class, 'ProductBrand')]")    #Finds all brands on the page
+    flowername = driver.find_elements(By.XPATH, "//span[contains(@class, 'ProductName')]")      #Finds all products on the page
+    flowersih = driver.find_elements(By.XPATH, "//p[contains(@class, 'StrainText')]")           #Finds all strain types on page
+    flowerpotency = driver.find_elements(By.XPATH, "//div[contains(@class, 'Potency')]")        #Finds all potency info on page
+    #flowerprice = driver.find_elements(By.XPATH, "")        #Finds all pricing info on page
 
+    # This section appends information to respective lists.
+    for match in flowerbrand:
+        flower_brand.append(match.text)
+    for match in flowername:
+        flower_name.append(match.text)
+    for match in flowersih:
+        flower_sih.append(match.text)
+    for match in flowerpotency:
+        flower_potency.append(match.text)
 
-###################################
-#    CSV FILE OPERATIONS BELOW
-###################################
+    ###################################
+    #    CSV FILE OPERATIONS BELOW
+    ###################################
 
-############################
-# Section below gets date information to prepend to CSV filename
-import csv
-import datetime
-
-current_date = datetime.datetime.now().strftime("%Y%m%d") # Get the current date in the format "yyyymmdd"
-#############################
-current_time = datetime.datetime.now()
-filetime = current_time.strftime('%H%M%S')
-
-data = [] # Create a list to store the data
-
-# Iterate through the elements and extract data
-for brand, name, sih, potency in zip(flowerbrand, flowername, flowersih, flowerpotency):
-    flowerbrand = brand.text
-    flowername = name.text
-    flowersih = sih.text
-    flowerpotency = potency.text
-    data.append([flowerbrand, flowername, flowersih, flowerpotency])
-
-# Store the data in a CSV file
-csv_file = f"{current_date}_{filetime}_thelandingflowerpricestest.csv"
-with open(csv_file, mode='w', newline='') as file:
-    writer = csv.writer(file)
     
-    # Write header
-    writer.writerow(['Product Brand', 'Product Name', 'Sativa/Indica/Hybrid', 'Potency', '1/8 Oz Price', '1/4 Oz Price', '1/2 Oz Price'])
+    data = [] # Create a list to store the data
+
+    # Iterate through the elements and extract data
+    for brand, name, sih, potency in zip(flowerbrand, flowername, flowersih, flowerpotency):
+        flowerbrand = brand.text
+        flowername = name.text
+        flowersih = sih.text
+        flowerpotency = potency.text
+        data.append([flowerbrand, flowername, flowersih, flowerpotency])
+
+    # Store the data in a CSV file
+    csv_file = f"{current_date}_{filetime}_thelandingflowerpricestest.csv"
+    with open(csv_file, mode='w', newline='') as file:
+        writer = csv.writer(file)
+        
+        # Write header
+        writer.writerow(['Product Brand', 'Product Name', 'Sativa/Indica/Hybrid', 'Potency', '1/8 Oz Price', '1/4 Oz Price', '1/2 Oz Price'])
+        
+        # Write data
+        writer.writerows(data)
+
+    print(f'Flower Pricing stored in {csv_file}.')
+
+    # Section below stores scraped flower shopping page data
+    announcement = driver.find_element(By.ID, "main-content")
+    global flowerlistings
+    flowerlistings = announcement.text
+    print("Flower price page scraped.")
     
-    # Write data
-    writer.writerows(data)
-
-print(f'Pricing data has been scraped and stored in {csv_file}.')
-
-# Section below stores scraped flower shopping page data
-announcement = driver.find_element(By.ID, "main-content")
-flowerlistings = announcement.text
-print("Flower price page scraped.")
+    return flowerlistings;
 
 ##################################################################
 #          Concentrates Listings, Quantities and Prices
 ##################################################################
-domain = 'https://the-landing-dispensary-bridgeport.thelandingwv.com/stores/the-landing-dispensary-bridgeport/products/concentrates'
-driver.get(domain);
-time.sleep(1)
+def landingconcentratescrape():
+    domain = 'https://the-landing-dispensary-bridgeport.thelandingwv.com/stores/the-landing-dispensary-bridgeport/products/concentrates'
+    driver.get(domain);
+    time.sleep(1)
 
-actions = ActionChains(driver)
-for _ in range(4):
-    actions.send_keys(Keys.SPACE).perform()
-    time.sleep(.5)
+    actions = ActionChains(driver)
+    for _ in range(4):
+        actions.send_keys(Keys.SPACE).perform()
+        time.sleep(.5)
 
-# Section below stores scraped concentrate shopping page data
-announcement = driver.find_element(By.ID, "main-content")
-concentratelistings = announcement.text
-print("Concentrate price page scraped.")
+    # Section below stores scraped concentrate shopping page data
+    announcement = driver.find_element(By.ID, "main-content")
+    global concentratelistings
+    concentratelistings = announcement.text
+    print("Concentrate price page scraped.")
 
 ##################################################################
 #           Vaporizers Listings, Quantities and Prices             
 ##################################################################
-domain = 'https://the-landing-dispensary-bridgeport.thelandingwv.com/stores/the-landing-dispensary-bridgeport/products/vaporizers'
+def landingvapescrape():
 
-driver.get(domain);
-time.sleep(1)
+    domain = 'https://the-landing-dispensary-bridgeport.thelandingwv.com/stores/the-landing-dispensary-bridgeport/products/vaporizers'
 
-actions = ActionChains(driver)
-for _ in range(5):
-    actions.send_keys(Keys.SPACE).perform()
-    time.sleep(.5)
+    driver.get(domain);
+    time.sleep(1)
 
-# Section below stores scraped vape shopping page data
-announcement = driver.find_element(By.ID, "main-content")
-vapelistings = announcement.text
-print("Vape price page scraped.")
+    actions = ActionChains(driver)
+    for _ in range(5):
+        actions.send_keys(Keys.SPACE).perform()
+        time.sleep(.5)
+
+    # Section below stores scraped vape shopping page data
+    announcement = driver.find_element(By.ID, "main-content")
+    global vapelistings
+    vapelistings = announcement.text
+    print("Vape price page scraped.")
 
 #####################################################################
-#
 # Writes completed flower, concentrate, vape price list in plaintext             
-#
 #####################################################################
-testtxtfile = f"{current_date}_{filetime}_text.txt"
-with open(testtxtfile,'w') as file:
-    file.write('The Landing Menu')
-    file.write('\n\n')
-    file.write(flowerlistings)
-    file.write('\n\n\n\n')
-    file.write(concentratelistings)
-    file.write('\n\n\n\n')
-    file.write(vapelistings)
-    
-print(testtxtfile, "written")
+def plaintextmenu():
+    testtxtfile = f"{current_date}_{filetime}_text.txt"
+    with open(testtxtfile,'w') as file:
+        file.write('The Landing Menu')
+        file.write('\n\n')
+        file.write(flowerlistings)
+        file.write('\n\n\n\n')
+        file.write(concentratelistings)
+        file.write('\n\n\n\n')
+        file.write(vapelistings)
+        
+    print(f'Flower Pricing stored in {testtxtfile}')
 
-#landingflowerscrape();
+
+##################################
+# Call predefinited classes above
+##################################
+landingflowerscrape();
+landingconcentratescrape();
+landingvapescrape();
+plaintextmenu();
