@@ -9,7 +9,7 @@ import sqlite3
 import numpy as np
 
 options = Options()
-add_argument('--headless')
+options.add_argument('--headless')
 options.add_argument("--window-size=1920,1200")
 driver = webdriver.Chrome(options=options, service=Service(ChromeDriverManager().install()))
 
