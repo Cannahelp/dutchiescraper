@@ -66,6 +66,7 @@ for category in CATEGORIES:
     time.sleep(2)
 
     NUM_PAGES = dutchie_get_num_pages()
+    print(NUM_PAGES)
 
     productList = []
 
@@ -144,6 +145,9 @@ for category in CATEGORIES:
                 "straintype text, concentration text)".format(category_sql_friendly))
 
     data = []
+
+    for i in productList:
+        print(i)
 
     
     for product in productList:
