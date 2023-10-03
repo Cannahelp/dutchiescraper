@@ -9,7 +9,7 @@ import sqlite3
 import numpy as np
 
 options = Options()
-options.add_argument('--headless')
+#options.add_argument('--headless')
 options.add_argument("--window-size=1920,1200")
 driver = webdriver.Chrome(options=options, service=Service(ChromeDriverManager().install()))
 
@@ -66,8 +66,7 @@ for category in CATEGORIES:
     time.sleep(2)
 
     NUM_PAGES = dutchie_get_num_pages()
-    print(NUM_PAGES)
-
+   
     productList = []
 
     for page in range(NUM_PAGES + 1):
@@ -145,10 +144,6 @@ for category in CATEGORIES:
                 "straintype text, concentration text)".format(category_sql_friendly))
 
     data = []
-
-    for i in productList:
-        print(i)
-
     
     for product in productList:
         for index, price in enumerate(product.prices):
@@ -162,7 +157,7 @@ for category in CATEGORIES:
                 (product.brand, product.name, strippedSize, strippedPrice, pricePerGram, product.strainType,
                     product.concentration)
             ]
-        print(data)
+#        print(data)
 
     cur.executemany('INSERT INTO {} VALUES(?, ?, ?, ?, ?, ?, ?)'.format(category_sql_friendly), data)
 
